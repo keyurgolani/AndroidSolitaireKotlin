@@ -1,13 +1,11 @@
 package io.github.keyurgolani.solitaire
 
 import android.content.Context
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.view.Gravity
 import android.view.View
-import io.github.keyurgolani.solitaire.backend.FoundationPileView
-import io.github.keyurgolani.solitaire.backend.foundationPileView
 import org.jetbrains.anko.*
 
 val cardbackDrawable = R.drawable.cardback_green5
@@ -23,57 +21,29 @@ val Context.cardWidth: Int
 val Context.cardHeight: Int
         get() = cardWidth * 190 / 140
 
-class MainActivity : AppCompatActivity(), GameView {
-
-    var deckView: DeckView? = null
-    var wastePileView: WastePileView? = null
-    val foundationPileViews: Array<FoundationPileView?> = arrayOfNulls(4)
-    val tableauPileViews: Array<TableauPileView?> = arrayOfNulls(7)
-
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        GamePresenter.setGameView(this)
-        GameModel.resetGame()
-
         verticalLayout {
-            leftPadding = dip(4)
-            rightPadding = dip(4)
-            topPadding = dip(8)
-            linearLayout {
-                deckView = deckView().lparams(width = cardWidth, height = cardHeight)
-                wastePileView = wastePileView().lparams(width = cardWidth, height = cardHeight)
-                view().lparams(width = cardWidth, height = 0)
-                for (i in 0..3) {
-                    foundationPileViews[i] = foundationPileView(i).lparams(width = cardWidth, height = cardHeight)
-                }
+            imageView {
+                id = 50
+                imageResource = R.drawable.welcomeimage
+            }.lparams {
+                width = (displayMetrics.widthPixels) * 3 / 4
+                height = width * 642 / 953
+                leftMargin = width / 6
+                topMargin = displayMetrics.heightPixels / 4
             }
-            linearLayout {
-                for (i in 0..6) {
-                    tableauPileViews[i] = tableauPileView(i).lparams(width = cardWidth, height = matchParent)
+            button {
+                text = "Play"
+                onClick {
+                    val intent: Intent = Intent(baseContext, GameActivity::class.java)
+                    startActivity(intent)
                 }
-            }.lparams(height = matchParent) {
-                topMargin = cardHeight / 2
+            }.lparams {
+                topMargin = displayMetrics.heightPixels / 4
+                gravity = Gravity.CENTER_HORIZONTAL
             }
         }
-
-    }
-
-    override fun update() {
-        deckView!!.update()
-        wastePileView!!.update()
-        foundationPileViews.forEach { it!!.update() }
-        tableauPileViews.forEach { it!!.update() }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menu.add("Start Over")
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        GameModel.resetGame()
-        update()
-        return true
     }
 }
